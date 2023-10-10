@@ -250,12 +250,13 @@ def create_order_window(db):
         elif event == "Confirm Selection":
             selected_category = values["-CATEGORIES-"]
             selected_products = values["-PRODUCTS-"]
+billing_window(db,selected_product_names
 
             if selected_products and selected_category:
                 selected_product_names.extend(selected_products)
                 window["-SELECTED-PRODUCTS-"].update(values=selected_product_names)  # Update the selected products list
                 
-                billing_window(db,selected_products)
+                
 
                 window.close()
                 break
@@ -265,7 +266,7 @@ def create_order_window(db):
 
 
 # Function to fetch order details of the selected products from the database
-def fetch_order_details(db,selected_products):
+def fetch_order_details(db,selected_product_names):
     try:
         cursor = db.cursor(dictionary=True)
 
@@ -275,7 +276,7 @@ def fetch_order_details(db,selected_products):
             FROM products p
             JOIN categories c ON p.CategoryID = c.CategoryID
             WHERE p.ProductName IN (%s);
-        """, (", ".join(selected_products),))
+        """, (", ".join(selected_product_names),))
 
         order_details = cursor.fetchall()
 
@@ -286,9 +287,9 @@ def fetch_order_details(db,selected_products):
         return []
 
  # Function to display the billing window
-def billing_window(db, selected_products):
+def billing_window(db, selected_product_names):
     sg.theme('DarkBlue')
-    order_details = fetch_order_details(db, selected_products)
+    order_details = fetch_order_details(db, selected_product_names)
 
 
     # Define the layout of the billing window
@@ -310,7 +311,7 @@ def billing_window(db, selected_products):
     table_data = []
     for order in order_details:
         category_name = order["CategoryName"]
-        product_name = order["ProductName"]
+        product_name = order["Name"]
         product_price = order["ProductPrice"]
         total_amount += product_price
 
