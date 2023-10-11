@@ -21,7 +21,7 @@ def insert_customer_data(db, name, gender, email, phone, password):
         cursor = db.cursor()
 
         # Insert customer information into the "customers" table
-        insert_query = "INSERT INTO customers VALUES (%s, %s, %s, %s, %s);"
+        insert_query = "INSERT INTO customers (Cust_Name, Cust_Gender, Cust_EmailAddress, Cust_PhoneNumber, Cust_Password) VALUES (%s, %s, %s, %s, %s);"
         values = (name, gender, email, phone, password)
         cursor.execute(insert_query, values)
 
@@ -124,6 +124,7 @@ def customer_registration_window():
     ]
 
     window = sg.Window('Customer Registration', layout)
+    customer_phone = None
 
     while True:
         event, values = window.read()
@@ -142,6 +143,7 @@ def customer_registration_window():
             if db:
                 if insert_customer_data(db, name, gender, email, phone, password):
                     sg.popup("Customer Registration Successful!")
+                    customer_phone = phone
                     window.close()
 
                     # Open the customer order window
@@ -154,6 +156,43 @@ def customer_registration_window():
 
     window.close()
 
+# Create a login window for staff
+def staff_login_window(db):
+    layout = [
+        [sg.Text("Staff ID:"), sg.InputText(key='-ID-')],
+        [sg.Text("Password:"), sg.InputText(key='-PASSWORD-', password_char='*')],
+        [sg.Button("Login"), sg.Button("Exit")],
+    ]
+    window = sg.Window("Customer Login", layout, finalize=True)
+    
+    cursor = db.cursor()
+
+    while True:
+        event, values = window.read()
+
+        if event == sg.WIN_CLOSED or event == "Exit":
+            break
+        elif event == "Login":
+            cid = values['-ID-']
+            password = values['-PASSWORD-']
+
+            # Query the database to verify the user's credentials using parameterized query
+            cursor.execute("SELECT * FROM staff WHERE Staff_ID=%s AND Password=%s;", (cid, password))
+            user = cursor.fetchone()
+
+            if user:
+                sg.popup("Login Successful", f"Welcome, {user[1]}")
+                window.close()
+                # Open window which has buttons "see existing orders", "see all customer details", "add a new product", "add new category"
+                staff_options_window()
+
+            else:
+                sg.popup_error("Login Failed", "Invalid username or password")
+
+    db.close()
+    window.close()
+
+
 # Create a login window for customers
 def customer_login_window(db):
     layout = [
@@ -164,6 +203,7 @@ def customer_login_window(db):
     window = sg.Window("Customer Login", layout, finalize=True)
     
     cursor = db.cursor()
+    customer_phone = None
 
     while True:
         event, values = window.read()
@@ -179,7 +219,8 @@ def customer_login_window(db):
             user = cursor.fetchone()
 
             if user:
-                sg.popup("Login Successful", f"Welcome, {user[0]}")
+                sg.popup("Login Successful", f"Welcome, {user[1]}")
+                customer_phone = phone
                 window.close()
                 # Open customer order window
                 customer_order_window(db)
@@ -250,13 +291,23 @@ def create_order_window(db):
         elif event == "Confirm Selection":
             selected_category = values["-CATEGORIES-"]
             selected_products = values["-PRODUCTS-"]
-billing_window(db,selected_product_names
 
             if selected_products and selected_category:
                 selected_product_names.extend(selected_products)
                 window["-SELECTED-PRODUCTS-"].update(values=selected_product_names)  # Update the selected products list
-                
-                
+
+                # Call the billing window function to display billing details
+                product_info = fetch_product_info_by_names(db, selected_product_names)
+                billing_window = display_billing_window(product_info)
+
+               
+
+                # Allow the billing window to stay open until the user closes it
+                while True:
+                    event, _ = billing_window.read()
+
+                    if event == sg.WIN_CLOSED or event == "Exit":
+                        break
 
                 window.close()
                 break
@@ -265,41 +316,45 @@ billing_window(db,selected_product_names
 
 
 
-# Function to fetch order details of the selected products from the database
-def fetch_order_details(db,selected_product_names):
+# To fetch info of only the products in the list selected_product_names
+def fetch_product_info_by_names(db, selected_product_names):
     try:
         cursor = db.cursor(dictionary=True)
 
-        # Join 'products' and 'categories' tables to get order details
-        cursor.execute("""
-            SELECT p.ProductName, p.Price, c.CategoryName
+        # Create placeholders for the list of product names
+        placeholders = ', '.join(['%s' for _ in selected_product_names])
+
+        # Construct the SQL query with placeholders
+        query = f"""
+            SELECT c.CategoryName, p.ProductName, p.Price
             FROM products p
             JOIN categories c ON p.CategoryID = c.CategoryID
-            WHERE p.ProductName IN (%s);
-        """, (", ".join(selected_product_names),))
+            WHERE p.ProductName IN ({placeholders});
+        """
+        
+        print("Query:", query)  # Print the query for debugging
+        cursor.execute(query, selected_product_names)
 
-        order_details = cursor.fetchall()
+        product_info = cursor.fetchall()
 
         cursor.close()
-        return order_details
+        return product_info
     except mysql.connector.Error as err:
         print(f"Error: {err}")
         return []
 
- # Function to display the billing window
-def billing_window(db, selected_product_names):
+# To create the billing window
+def display_billing_window(product_details):
     sg.theme('DarkBlue')
-    order_details = fetch_order_details(db, selected_product_names)
-
 
     # Define the layout of the billing window
     layout = [
-        [sg.Text("Billing Details", font=("Helvetica", 18))],
-        [sg.Table(values=[], headings=["Sr. No.", "Category Name", "Product Name", "Product Price"], auto_size_columns=False,
-                  col_widths=[5, 20, 20, 15], justification="right", num_rows=10, key='-TABLE-')],
-        [sg.Text("Total Amount:", font=("Helvetica", 14)), sg.Text("", size=(10, 1), font=("Helvetica", 14), key='-TOTAL-')],
-        [sg.Button("Confirm Order"), sg.Exit()]
-    ]
+    [sg.Text("Billing Details", font=("Helvetica", 18))],
+    [sg.Table(values=[], headings=["Sr. No.", "Category Name", "Product Name", "Product Price"], auto_size_columns=False,
+              col_widths=[5, 20, 20, 15], justification="center", num_rows=10, key='-TABLE-')],
+    [sg.Text("Total Amount:", font=("Helvetica", 14)), sg.Text("", size=(10, 1), font=("Helvetica", 14), key='-TOTAL-', justification="center")],
+    [sg.Button("Confirm Order"), sg.Exit()]
+]
 
     window = sg.Window('Billing Window', layout, finalize=True)
 
@@ -309,30 +364,162 @@ def billing_window(db, selected_product_names):
 
     # Populate the table with order details
     table_data = []
-    for order in order_details:
+    for order in product_details:
         category_name = order["CategoryName"]
-        product_name = order["Name"]
-        product_price = order["ProductPrice"]
+        product_name = order["ProductName"]
+        product_price = float(order["Price"])
         total_amount += product_price
 
         table_data.append([serial_number, category_name, product_name, f"Rs.{product_price:.2f}"])
         serial_number += 1
 
     window['-TABLE-'].update(values=table_data)
-    window['-TOTAL-'].update(f"${total_amount:.2f}")
+    window['-TOTAL-'].update(f"Rs.{total_amount:.2f}")
+
+    return window
+
+
+
+
+
+# To fetch all from the table customers and display it in a window see_customer_data
+def fetch_all_and_displaywindow(db):
+    try:
+        cursor = db.cursor()
+        cursor.execute("SELECT * from customers")
+        customer_data = cursor.fetchall()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+    sg.theme('DarkBlue')
+
+    layout = [
+        [sg.Text("Customer Details", font=("Helvetica", 18))],
+        [sg.Table(values=customer_data, headings=["Name", "Gender", "Email", "Phone", "Password"], auto_size_columns=False,
+                  display_row_numbers=False, justification="center", num_rows=10, key='-TABLE-')],
+        [sg.Button("Exit")]
+    ]
+
+    window = sg.Window("Customer Details", layout, finalize=True)
+
+    while True:
+        event, _ = window.read()
+
+        if event == sg.WIN_CLOSED or event == "Exit":
+            break
+
+    window.close()
+
+# To take inputs from the staff for the new product and then insert the values into the products table
+def add_product_to_db(db):
+    sg.theme('DarkBlue')
+
+    layout = [
+        [sg.Text("Add New Product", font=("Helvetica", 18))],
+        [sg.Text("Product Name:"), sg.InputText(key='-PRODUCTNAME-')],
+        [sg.Text("Price:"), sg.InputText(key='-PRICE-')],
+        [sg.Text("Category ID:"), sg.InputText(key='-CATEGORYID-')],
+        [sg.Button("Add Product"), sg.Button("Exit")]
+    ]
+
+    window = sg.Window("Add Product", layout, finalize=True)
 
     while True:
         event, values = window.read()
 
         if event == sg.WIN_CLOSED or event == "Exit":
             break
-        elif event == "Confirm Order":
-            sg.popup("Order Confirmed!")
-            window.close()
-            break
+        elif event == "Add Product":
+            product_name = values['-PRODUCTNAME-']
+            price = values['-PRICE-']
+            category_id = values['-CATEGORYID-']
 
+            try:
+                cursor = db.cursor()
+
+                insert_query = "INSERT INTO products (ProductName, Price, CategoryID) VALUES (%s, %s, %s);"
+                values = (product_name, price, category_id)
+                cursor.execute(insert_query, values)
+
+                db.commit()
+                sg.popup("Product Added Successfully!")
+            except mysql.connector.Error as err:
+                sg.popup_error(f"Error occurred during product addition: {err}")
 
     window.close()
+
+# To take inputs from the staff for the new category and then insert the values into the table categories
+def add_category_to_db(db):
+    sg.theme('DarkBlue')
+
+    layout = [
+        [sg.Text("Add New Category", font=("Helvetica", 18))],
+        [sg.Text("Category ID:"), sg.InputText(key='-CATEGORYID-')],
+        [sg.Text("Category Name:"), sg.InputText(key='-CATEGORYNAME-')],
+        [sg.Button("Add Category"), sg.Button("Exit")]
+    ]
+
+    window = sg.Window("Add Category", layout, finalize=True)
+
+    while True:
+        event, values = window.read()
+
+        if event == sg.WIN_CLOSED or event == "Exit":
+            break
+        elif event == "Add Category":
+            category_id = values['-CATEGORYID-']
+            category_name = values['-CATEGORYNAME-']
+
+            try:
+                cursor = db.cursor()
+
+                insert_query = "INSERT INTO categories (CategoryID, CategoryName) VALUES (%s, %s);"
+                values = (category_id, category_name)
+                cursor.execute(insert_query, values)
+
+                db.commit()
+                sg.popup("Category Added Successfully!")
+            except mysql.connector.Error as err:
+                sg.popup_error(f"Error occurred during category addition: {err}")
+
+    window.close()
+
+# Once the staff logins asking them what they want to do
+def staff_options_window():
+    sg.theme('DarkBlue')
+
+    layout = [
+        [sg.Text("Staff Options", font=("Helvetica", 18))],
+        [sg.Button("View Orders")],
+        [sg.Button("Customer Details")],
+        [sg.Button("Add Product")],
+        [sg.Button("Add Category")],
+        [sg.Button("Exit")]
+    ]
+
+    window = sg.Window("Staff Options", layout, finalize=True)
+
+    while True:
+        event, _ = window.read()
+
+        if event == sg.WIN_CLOSED or event == "Exit":
+            break
+        elif event == "View Orders":
+            sg.popup("Ok")
+        elif event == "Customer Details":
+            fetch_all_and_displaywindow(connect_to_database())
+        elif event == "Add Product":
+            # Call a function to add a new product
+            add_product_to_db(connect_to_database())
+        elif event == "Add Category":
+            # Call a function to add a new category
+            add_category_to_db(connect_to_database())
+
+    window.close()
+
+# To insert the values into the table orders
+#def insert_info_into_ordertable:
+
 
 
 # Main function
@@ -353,15 +540,16 @@ def main():
         if event_choice == sg.WIN_CLOSED or event_choice == "Exit":
             break
         elif event_choice == "Staff":
-            sg.popup_ok("You selected 'Staff'.")
+            staff_login_window(connect_to_database())
         elif event_choice == "New User":
             window_choice.close()  # Close the current window
             customer_registration_window()
         elif event_choice == "Existing User":
             window_choice.close()  # Close the current window
-            customer_login_window(connect_to_database())
+            customer_login_window(connect_to_database())    
 
     window_choice.close()
+
 
 
 if __name__ == "__main__":
