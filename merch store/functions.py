@@ -40,6 +40,7 @@ def staff_login_window(db):
             user = cursor.fetchone()
 
             if user:
+                window.hide()
                 sg.popup("Login Successful", f"Welcome, {user[1]}")
                 window.close()
                 # Open window which has buttons "see existing orders", "see all customer details", "add a new product", "add new category"
@@ -69,6 +70,8 @@ def staff_options_window():
     while True:
         event, _ = window.read()
 
+        if event in ('View Customer Orders','Customer Details','Add Product','Add Category'):
+            window.close()
         if event == sg.WIN_CLOSED or event == "Exit":
             break
         elif event == "View Customer Orders":
@@ -93,7 +96,7 @@ def display_all_orders(db):
         [sg.Table(values=[], headings=["Customer ID", "Name", "Phone Number", "Address", "Note", "Time"], 
                   auto_size_columns=False, col_widths=[9, 20, 15, 25, 25, 15], display_row_numbers=False, 
                   justification="center", num_rows=20, key='-TABLE-')],
-        [sg.Button("Exit")]
+        [sg.Button("Exit"), sg.Button('Back')]
     ]
 
     window = sg.Window("All Orders", layout, finalize=True)
@@ -120,6 +123,10 @@ def display_all_orders(db):
 
         if event == sg.WIN_CLOSED or event == "Exit":
             break
+        if event == 'Back':
+            window.close()
+            staff_options_window()
+
 
     window.close()
 
@@ -171,6 +178,7 @@ def add_product_to_db(db):
         if event == sg.WIN_CLOSED or event == "Exit":
             break
         elif event == "Add Product":
+            window.close()
             product_name = values['-PRODUCTNAME-']
             price = values['-PRICE-']
             category_id = values['-CATEGORYID-']
@@ -208,6 +216,7 @@ def add_category_to_db(db):
         if event == sg.WIN_CLOSED or event == "Exit":
             break
         elif event == "Add Category":
+            window.hide()
             category_id = values['-CATEGORYID-']
             category_name = values['-CATEGORYNAME-']
 
@@ -247,6 +256,8 @@ def customer_registration_window():
         if event == sg.WIN_CLOSED or event == "Exit":
             break
         elif event == "Register":
+
+            window.close()
             name = values["-NAME-"]
             gender = "Male" if values["-MALE-"] else "Female"
             email = values["-EMAIL-"]
@@ -268,8 +279,6 @@ def customer_registration_window():
                     sg.popup_error("Error occurred during registration. Please try again later.")
 
                 db.close()
-
-    window.close()
 
 # Function 9: Insert customer data into the database
 def insert_customer_data(db, name, gender, email, phone, password):
@@ -340,7 +349,8 @@ def customer_order_window(db):
 
     while True:
         event, values = window.read()
-
+        if event in ('See Existing Orders','Create New Order'):
+            window.close()
         if event == sg.WIN_CLOSED or event == "Exit":
             break
         elif event == "Create New Order":
@@ -385,6 +395,7 @@ def create_order_window(db):
 
             window["-PRODUCTS-"].update(values=selected_products)
         elif event == "Confirm Selection":
+            window.hide()
             selected_category = values["-CATEGORIES-"]
             selected_products = values["-PRODUCTS-"]
 
@@ -501,6 +512,7 @@ def display_billing_window(product_details):
         if event == sg.WIN_CLOSED or event == "Exit":
             break
         elif event == "Confirm Order":
+            window.hide()
             get_customer_details_and_put_it_in_orders(connect_to_database())
             window.close()
             
