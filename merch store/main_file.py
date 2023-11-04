@@ -8,7 +8,7 @@ def main():
     # Create a window for user type selection
     layout_choice = [
         [sg.Image(filename="meow.png")],
-        [sg.Text("Welcome to da store", font=('Courier', 20))],
+        [sg.Text("Welcome to da cool store", font=('Courier', 20))],
         [sg.Text("Are you a staff member or a customer?", font=('Arial', 15))],
         [sg.Button("Staff"), sg.Button("New User"), sg.Button("Existing User"), sg.Exit()]
     ]
@@ -17,6 +17,9 @@ def main():
 
     while True:
         event_choice, _ = window_choice.read()
+
+        if event_choice in ('Staff','New User','Existing User'):
+            window_choice.close()
 
         if event_choice == sg.WIN_CLOSED or event_choice == "Exit":
             break
@@ -30,8 +33,6 @@ def main():
             customer_login_window(connect_to_database())    
 
     window_choice.close()
-
-
 
 if __name__ == "__main__":
     main()
