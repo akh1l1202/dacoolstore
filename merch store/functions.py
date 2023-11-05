@@ -11,8 +11,8 @@ def connect_to_database():
             database='dacoolstore'
         )
         return db
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
+    except mysql.connector.Error as error:
+        print(f"Error: {error}")
         return None
 
 # Function 2: Create a login window for staff
