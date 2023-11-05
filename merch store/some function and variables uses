@@ -1,1 +1,2 @@
-finalize=True at
+finalize=True at line 25 in functions.py: to let the GUI finalized, then you can run any code about GUI or after GUI initialized. Method Window. read will wait event from GUI, so it do nothing before any event, like click the button.
+
