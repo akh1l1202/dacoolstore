@@ -5,10 +5,10 @@ import PySimpleGUI as sg
 def connect_to_database():
     try:
         db = mysql.connector.connect(
-host='sql12.freemysqlhosting.net',
-user='sql12659263',
-password='FscMcuGwXr',
-database='sql12659263'
+            host='sql12.freemysqlhosting.net',
+            user='sql12659263',
+            password='FscMcuGwXr',
+            database='sql12659263'
         )
         return db
     except mysql.connector.Error as error:
