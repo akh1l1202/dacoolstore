@@ -1,26 +1,27 @@
 import mysql.connector
 import PySimpleGUI as sg
+from datetime import datetime
 
 # Function 1: Establish a connection to the MySQL database
 def connect_to_database():
     try:
         db = mysql.connector.connect(
-            host='sql12.freemysqlhosting.net',
-            user='sql12659263',
-            password='FscMcuGwXr',
-            database='sql12659263'
+            host='127.0.0.1',
+            user='root',
+            password='akhil1202',
+            database='dacoolstore'
         )
         return db
-    except mysql.connector.Error as error:
-        print(f"Error: {error}")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
         return None
 
 # Function 2: Create a login window for staff
 def staff_login_window(db):
     layout = [
-        [sg.Text("Staff ID:"), sg.InputText(key='-ID-')],
+        [sg.Text("Staff ID:", font=('Courier', 20)), sg.InputText(key='-ID-'),],
         [sg.Text("Password:"), sg.InputText(key='-PASSWORD-', password_char='*')],
-        [sg.Button("Login"), sg.Button("Exit")],
+        [sg.Button("Login", bind_return_key=True), sg.Button("Exit"), sg.Button("Back")],
     ]
     window = sg.Window("Staff Login", layout, finalize=True)
     
@@ -31,7 +32,12 @@ def staff_login_window(db):
 
         if event == sg.WIN_CLOSED or event == "Exit":
             break
-        elif event == "Login":
+        if event == "Back":
+           window.close()
+           main()
+
+            
+        elif event in ('Login'):
             cid = values['-ID-']
             password = values['-PASSWORD-']
 
@@ -41,14 +47,16 @@ def staff_login_window(db):
 
             if user:
                 window.hide()
-                sg.popup("Login Successful", f"Welcome, {user[1]}")
+                f = (datetime.now()).strftime("%d-%m-%y %H:%M:%S")
+                sg.popup("Login Successful!", f"Welcome, {user[1]}. Have a nice day ^^ \n"
+                "\n",f)
                 window.close()
                 # Open window which has buttons "see existing orders", "see all customer details", "add a new product", "add new category"
                 staff_options_window()
 
             else:
                 sg.popup_error("Login Failed", "Invalid username or password")
-
+    
     db.close()
     window.close()
 
@@ -58,11 +66,10 @@ def staff_options_window():
 
     layout = [
         [sg.Text("Staff Options", font=("Helvetica", 18))],
-        [sg.Button("View Customer Orders")],
-        [sg.Button("Customer Details")],
-        [sg.Button("Add Product")],
-        [sg.Button("Add Category")],
-        [sg.Button("Exit")]
+        [sg.Text("What do you want to do now? @-@")],
+        [sg.Button("View Customer Orders"), sg.Button("Customer Details")],
+        [sg.Button("Add Product"), sg.Button("Add Category")],
+        [sg.Button("Exit"), sg.Button('Logout')]
     ]
 
     window = sg.Window("Staff Options", layout, finalize=True)
@@ -71,9 +78,12 @@ def staff_options_window():
         event, _ = window.read()
 
         if event in ('View Customer Orders','Customer Details','Add Product','Add Category'):
-            window.close()
+            window.hide()
         if event == sg.WIN_CLOSED or event == "Exit":
             break
+        if event == 'Logout':
+            window.hide()
+            staff_login_window(connect_to_database())
         elif event == "View Customer Orders":
             display_all_orders(connect_to_database())
         elif event == "Customer Details":
@@ -84,7 +94,7 @@ def staff_options_window():
         elif event == "Add Category":
             # Call a function to add a new category
             add_category_to_db(connect_to_database())
-
+    
     window.close()
 
 # Function 4: To display all the orders
@@ -93,8 +103,8 @@ def display_all_orders(db):
 
     layout = [
         [sg.Text("All Orders", font=("Helvetica", 18))],
-        [sg.Table(values=[], headings=["Customer ID", "Name", "Phone Number", "Address", "Note", "Time"], 
-                  auto_size_columns=False, col_widths=[9, 20, 15, 25, 25, 15], display_row_numbers=False, 
+        [sg.Table(values=[], headings=["Cust. ID", "Name", "Phone Number", "Address", "Note", "Time"], 
+                  auto_size_columns=False, col_widths=[6, 12, 13, 20, 20, 15], display_row_numbers=False, 
                   justification="center", num_rows=20, key='-TABLE-')],
         [sg.Button("Exit"), sg.Button('Back')]
     ]
@@ -143,9 +153,9 @@ def fetch_all_and_displaywindow(db):
 
     layout = [
         [sg.Text("Customer Details", font=("Helvetica", 18))],
-        [sg.Table(values=customer_data, headings=["Name", "Gender", "Email", "Phone", "Password"], auto_size_columns=False,
+        [sg.Table(values=customer_data, headings=["CustID", "Name", "Gender", "Email", "Password"], auto_size_columns=False,
                   display_row_numbers=False, justification="center", num_rows=10, key='-TABLE-')],
-        [sg.Button("Exit")]
+        [sg.Button("Exit"), sg.Button('Back')]
     ]
 
     window = sg.Window("Customer Details", layout, finalize=True)
@@ -155,6 +165,9 @@ def fetch_all_and_displaywindow(db):
 
         if event == sg.WIN_CLOSED or event == "Exit":
             break
+        if event == 'Back':
+            window.hide()
+            staff_options_window()
 
     window.close()
 
@@ -167,7 +180,7 @@ def add_product_to_db(db):
         [sg.Text("Product Name:"), sg.InputText(key='-PRODUCTNAME-')],
         [sg.Text("Price:"), sg.InputText(key='-PRICE-')],
         [sg.Text("Category ID:"), sg.InputText(key='-CATEGORYID-')],
-        [sg.Button("Add Product"), sg.Button("Exit")]
+        [sg.Button("Add Product"), sg.Button("Exit"), sg.Button('Back')]
     ]
 
     window = sg.Window("Add Product", layout, finalize=True)
@@ -177,8 +190,11 @@ def add_product_to_db(db):
 
         if event == sg.WIN_CLOSED or event == "Exit":
             break
+        if event == 'Back':
+            window.hide()
+            staff_options_window()
         elif event == "Add Product":
-            window.close()
+            window.hide()
             product_name = values['-PRODUCTNAME-']
             price = values['-PRICE-']
             category_id = values['-CATEGORYID-']
@@ -191,7 +207,9 @@ def add_product_to_db(db):
                 cursor.execute(insert_query, values)
 
                 db.commit()
-                sg.popup("Product Added Successfully!")
+
+                sg.popup(f"Task completed successfully!\n{product_name} was successfully added as a product in the system!")
+                staff_options_window()
             except mysql.connector.Error as err:
                 sg.popup_error(f"Error occurred during product addition: {err}")
 
@@ -205,6 +223,7 @@ def add_category_to_db(db):
         [sg.Text("Add New Category", font=("Helvetica", 18))],
         [sg.Text("Category ID:"), sg.InputText(key='-CATEGORYID-')],
         [sg.Text("Category Name:"), sg.InputText(key='-CATEGORYNAME-')],
+        [sg.Text("\nCategoryID should not be matching with any existing ones.")],
         [sg.Button("Add Category"), sg.Button("Exit")]
     ]
 
@@ -606,3 +625,36 @@ def display_customer_orders(db):
                 sg.popup("Please enter a valid phone number.")
 
     window.close()
+
+# Function 19: Main function
+def main():
+    sg.theme('BrownBlue')
+
+    # Create a window for user type selection
+    layout_choice = [
+        [sg.Image(filename="meow.png")],
+        [sg.Text("Welcome to da cool store", font=('Courier', 20))],
+        [sg.Text("Are you a staff member or a customer?", font=('Arial', 15))],
+        [sg.Button("Staff"), sg.Button("New User"), sg.Button("Existing User"), sg.Exit()]
+    ]
+
+    window_choice = sg.Window('Da Cool Store', layout_choice, element_justification="c")
+
+    while True:
+        event_choice, _ = window_choice.read()
+
+        if event_choice in ('Staff','New User','Existing User'):
+            window_choice.close()
+
+        if event_choice == sg.WIN_CLOSED or event_choice == "Exit":
+            break
+        elif event_choice == "Staff":
+            staff_login_window(connect_to_database())
+        elif event_choice == "New User":
+            window_choice.close()  # Close the current window
+            customer_registration_window()
+        elif event_choice == "Existing User":
+            window_choice.close()  # Close the current window
+            customer_login_window(connect_to_database())    
+
+    window_choice.close()
