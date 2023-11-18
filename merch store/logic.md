@@ -73,3 +73,6 @@
     - Function 18: Takes inputs from the user about their order.
     - Function 19: Displays the customers order info if the customer selects see existing orders, asks for their phone number and then retrieves data.
     - Function 20: Main function, displaying the main gui window.
+
+
+   # make a tabgroup which has two tabs, 1) which shows all the orders. 2) which first takes input as orderid, there is a button infront of it 'show details' which fetches data from table on basis of order id and then displays it and theres is text 
