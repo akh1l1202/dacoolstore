@@ -55,21 +55,21 @@
 
     - Function 1: Establishes a connection to the MySQL database
     - Function 2: Creates a login window for staff, verifies the userid and password.
-    - Function 3: Asks the staff person, what they want to do now.
-    - Function 4: Displays all orders made by the customers to the staff.
-    - Function 5: Displays all info of the customers to the staff.
-    - Function 6: Adds products.
-    - Function 7: Adds categories.
-    - Function 8: Creates a customer registration window and takes all their information.
-    - Function 9: Stores the customer data into the table.
-    - Function 10: Creates a login window, and verifies the customer phone number and password.
-    - Function 11: Creates a customer order window and asks them what they want to do.
-    - Function 12: Creates a window for order creation.
-    - Function 13: Fetches categories from the table.
-    - Function 14: Fetches products by categories from the table.
-    - Function 15: Fetches information of the products selected by the customer in order creation.
-    - Function 16: Creates a billing window and totals the amount.
-    - Function 17: Takes inputs from the user about their order.
-    - Function 18: Displays the customers order info if the customer selects see existing orders, asks for their phone number and then retrieves data.
-
-Remember that building an application involves both frontend and backend development. You'll need to implement GUI elements, handle user interactions, and manage the flow of data between the frontend and backend. Additionally, consider implementing security measures, optimizing database queries, and adhering to best practices for maintainable code.
+    - Function 3: Special administrator window access only for some people
+    - Function 4: Asks the staff person, what they want to do now.
+    - Function 5: Displays all orders made by the customers to the staff.
+    - Function 6: Displays all info of the customers to the staff.
+    - Function 7: Adds products.
+    - Function 8: Adds categories.
+    - Function 9: Creates a customer registration window and takes all their information.
+    - Function 10: Stores the customer data into the table.
+    - Function 11: Creates a login window, and verifies the customer phone number and password.
+    - Function 12: Creates a customer order window and asks them what they want to do.
+    - Function 13: Creates a window for order creation.
+    - Function 14: Fetches categories from the table.
+    - Function 15: Fetches products by categories from the table.
+    - Function 16: Fetches information of the products selected by the customer in order creation.
+    - Function 17: Creates a billing window and totals the amount.
+    - Function 18: Takes inputs from the user about their order.
+    - Function 19: Displays the customers order info if the customer selects see existing orders, asks for their phone number and then retrieves data.
+    - Function 20: Main function, displaying the main gui window.
