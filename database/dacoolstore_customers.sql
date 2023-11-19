@@ -31,7 +31,7 @@ CREATE TABLE `customers` (
   `Cust_Password` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`Cust_ID`),
   UNIQUE KEY `Cust_PhoneNumber` (`Cust_PhoneNumber`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
