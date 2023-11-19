@@ -32,7 +32,7 @@ CREATE TABLE `orders` (
   PRIMARY KEY (`OrderID`),
   KEY `Cust_PhoneNumber` (`Cust_PhoneNumber`),
   CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`Cust_PhoneNumber`) REFERENCES `customers` (`Cust_PhoneNumber`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
