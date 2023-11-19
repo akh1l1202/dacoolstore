@@ -10,10 +10,10 @@ Time: %H:%M:%S''')
 def connect_to_database():
     try:
         db = mysql.connector.connect(
-            host='127.0.0.1',
-            user='root',
-            password='akhil1202',
-            database='dacoolstore'
+            host='sql12.freemysqlhosting.net',
+            user='sql12663296',
+            password='5tsIMMy6fP',
+            database='sql12663296'
         )
         return db
 
@@ -55,7 +55,7 @@ def staff_login_window(db):
             db.commit()
 
             if cid == '1' and password == 'akhil1202':
-                sg.popup('Ok')
+                sg.popup('Admin functionality acquired. Please use with care \n\n',f)
                 # DEFINE SUPER USER FUNCTIONS ALONG WITH NORMAL FUNCTIONS
                 admin_window()
                 break
@@ -81,9 +81,8 @@ def admin_window():
 
     layout = [
         [sg.Text("AUTHORISED ACCESS ONLY, DO NOT COMMIT ANY CHANGES WHEN NOT TOLD TO DO SO.")],
-        [sg.Image(data=gif103, key='-GIF-')],
-        [sg.Button('Employee Attendance'), sg.Button('Update Employee Info')],
-        [sg.Button('View Customer Orders'), sg.Button('View Customer Details')],
+        [sg.Button('Employee Attendance'), sg.Button('Employee Info')],
+        [sg.Button('Customer Orders'), sg.Button('Customer Details')],
         [sg.Exit(), sg.Button('Logout')]
     ]
     window = sg.Window('Admin Window', layout, finalize=True)
@@ -92,7 +91,72 @@ def admin_window():
         event, values = window.read(timeout=25)
         if event in (sg.WIN_CLOSED, 'Exit'):
             break
-        window.Element('-GIF-').UpdateAnimation(gif103, time_between_frames=50)
+        elif event == 'Employee Attendance':
+            display_tab_window(connect_to_database())
+
+    window.close()
+
+def display_attendance_tab(db):
+
+    cursor = db.cursor()
+
+    # Fetch all data from the "attendance" table
+    cursor.execute("SELECT * FROM attendance;")
+    attendance_data = cursor.fetchall()
+
+    # Define the layout for the "Attendance" tab
+    attendance_tab_layout = [
+        [sg.Table(values=attendance_data, headings=['Attendance ID', 'Staff ID', 'Staff Name', 'Timestamp'],
+                  auto_size_columns=False, display_row_numbers=False, justification='center',
+                  key='-ATTENDANCE_TABLE-', enable_events=True)],
+    ]
+
+    return sg.Tab('Attendance', attendance_tab_layout)
+
+def staff_timestamp_tab(db):
+    # Define the layout for the "Staff Timestamp" tab
+    staff_timestamp_tab_layout = [
+        [sg.Text('Enter Staff ID:'), sg.InputText(key='-STAFF_ID-')],
+        [sg.Button('Fetch Timestamp')],
+        [sg.Text('', key='-TIMESTAMP_RESULT-', size=(50, 5))],
+    ]
+
+    return sg.Tab('Staff Timestamp', staff_timestamp_tab_layout)
+
+def display_tab_window(db):
+    sg.theme('LightGreen3')
+
+    # Create the layout for the main window with two tabs
+    layout = [
+        [sg.TabGroup([
+            [display_attendance_tab(db)],
+            [staff_timestamp_tab(db)],
+        ])],
+        [sg.Button('Exit')]
+    ]
+
+    # Create the main window
+    window = sg.Window('Attendance Information', layout)
+
+    while True:
+        event, values = window.read()
+
+        if event == sg.WIN_CLOSED or event == 'Exit':
+            break
+        elif event == 'Fetch Timestamp':
+            staff_id = values['-STAFF_ID-']
+            if staff_id:
+                cursor = db.cursor()
+                cursor.execute("SELECT Timestamp FROM attendance WHERE StaffID = %s;", (staff_id,))
+                timestamps = cursor.fetchall()
+                
+                #if timestamps:
+                    #timestamp_text = "\n".join(timestamps)
+                #else:
+                    #timestamp_text = f"No timestamp found for Staff ID {staff_id}"
+
+                window['-TIMESTAMP_RESULT-'].update(timestamp_text)
+
     window.close()
 
 # Function 4: Once the staff logins asking them what they want to do
