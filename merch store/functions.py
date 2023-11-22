@@ -92,7 +92,8 @@ def admin_window():
         if event in (sg.WIN_CLOSED, 'Exit'):
             break
         elif event == 'Employee Attendance':
-            display_tab_window(connect_to_database())
+            window.hide()
+            display_attendance_tab(connect_to_database())
 
     window.close()
 
@@ -105,59 +106,28 @@ def display_attendance_tab(db):
     attendance_data = cursor.fetchall()
 
     # Define the layout for the "Attendance" tab
-    attendance_tab_layout = [
+    layout = [
         [sg.Table(values=attendance_data, headings=['Attendance ID', 'Staff ID', 'Staff Name', 'Timestamp'],
                   auto_size_columns=False, display_row_numbers=False, justification='center',
                   key='-ATTENDANCE_TABLE-', enable_events=True)],
+        [sg.Exit(), sg.Button('Back')]
     ]
 
-    return sg.Tab('Attendance', attendance_tab_layout)
-
-def staff_timestamp_tab(db):
-    # Define the layout for the "Staff Timestamp" tab
-    staff_timestamp_tab_layout = [
-        [sg.Text('Enter Staff ID:'), sg.InputText(key='-STAFF_ID-')],
-        [sg.Button('Fetch Timestamp')],
-        [sg.Text('', key='-TIMESTAMP_RESULT-', size=(50, 5))],
-    ]
-
-    return sg.Tab('Staff Timestamp', staff_timestamp_tab_layout)
-
-def display_tab_window(db):
-    sg.theme('LightGreen3')
-
-    # Create the layout for the main window with two tabs
-    layout = [
-        [sg.TabGroup([
-            [display_attendance_tab(db)],
-            [staff_timestamp_tab(db)],
-        ])],
-        [sg.Button('Exit')]
-    ]
-
-    # Create the main window
-    window = sg.Window('Attendance Information', layout)
+    window = sg.Window('Staff Attendance', layout, finalize=True)
 
     while True:
-        event, values = window.read()
-
-        if event == sg.WIN_CLOSED or event == 'Exit':
+        event, _ = window.read()
+        if event in (sg.WIN_CLOSED,'Exit'):
             break
-        elif event == 'Fetch Timestamp':
-            staff_id = values['-STAFF_ID-']
-            if staff_id:
-                cursor = db.cursor()
-                cursor.execute("SELECT Timestamp FROM attendance WHERE StaffID = %s;", (staff_id,))
-                timestamps = cursor.fetchall()
-                
-                #if timestamps:
-                    #timestamp_text = "\n".join(timestamps)
-                #else:
-                    #timestamp_text = f"No timestamp found for Staff ID {staff_id}"
-
-                window['-TIMESTAMP_RESULT-'].update(timestamp_text)
+        elif event == 'Back':
+            window.hide()
+            admin_window()
 
     window.close()
+
+def employee_info_tab:
+    cursor = db
+    
 
 # Function 4: Once the staff logins asking them what they want to do
 def staff_options_window():
