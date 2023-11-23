@@ -75,4 +75,35 @@
     - Function 20: Main function, displaying the main gui window.
 
 
+
+
    # make a tabgroup which has two tabs, 1) which shows all the orders. 2) which first takes input as orderid, there is a button infront of it 'show details' which fetches data from table on basis of order id and then displays it and theres is text 
+
+import PySimpleGUI as sg
+
+# Define the layout with tabs
+layout = [
+    [sg.TabGroup([
+        [sg.Tab('Tab 1', [
+            [sg.Text('This is the content of Tab 1')],
+            [sg.Button('Button 1')]
+        ])],
+        [sg.Tab('Tab 2', [
+            [sg.Text('This is the content of Tab 2')],
+            [sg.Button('Button 2')]
+        ])],
+    ])],
+    [sg.Button('Exit')]
+]
+
+# Create the window
+window = sg.Window('TabGroup Example', layout)
+
+# Event loop
+while True:
+    event, values = window.read()
+
+    if event == sg.WIN_CLOSED or event == 'Exit':
+        break
+
+window.close()
