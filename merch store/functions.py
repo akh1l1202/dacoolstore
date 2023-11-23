@@ -133,7 +133,9 @@ def employee_info_tab():
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-    display_layout = [
+    layout = [
+        [sg.TabGroup([
+        display_layout = [
         [sg.Text("Employee Information", font=("Helvetica", 18))],
         [sg.Table(values=staff_info, headings=["StaffID", "Name", "Post", "Gender", "Password"], auto_size_columns=False,
                   display_row_numbers=False, justification="center", num_rows=10, key='-TABLE-')],
@@ -144,9 +146,52 @@ def employee_info_tab():
         [sg.Text('Enter Staff Name:'), sg.InputText(key='-STAFF_NAME-')],
         [sg.Button('Submit'), sg.Button('Cancel')]
     ]
-    update_layout = [
-        
-    ]
+    
+
+
+def staff_info_window():
+    sg.theme('LightGrey1')  # Set the theme
+    window = sg.Window('Staff Information', [
+        [sg.Text('Enter Staff ID:'), sg.InputText(key='-STAFF_ID-')],
+        [sg.Button('Submit'), sg.Button('Cancel')]
+    ])
+
+    while True:
+        event, values = window.read()
+
+        if event == sg.WIN_CLOSED or event == 'Cancel':
+            break
+        elif event == 'Submit':
+            staff_id = values['-STAFF_ID-']
+            staff_info = retrieve_staff_info_from_database(staff_id)  # You need to implement this function
+
+            if staff_info:
+                info_window = sg.Window('Staff Information', [
+                    [sg.Text(f"Staff ID: {staff_info['staff_id']}")],
+                    [sg.Text(f"Staff Name: {staff_info['staff_name']}")],
+                    [sg.Text(f"Staff Post: {staff_info['staff_post']}")],
+                    [sg.Text(f"Gender: {staff_info['gender']}")],
+                    [sg.Text(f"Password: {staff_info['password']}")],
+                    [sg.Button('Change Staff Name'), sg.Button('Change Staff Post'), sg.Button('Change Gender'), sg.Button('Change Password'), sg.Button('Cancel')]
+                ])
+
+                while True:
+                    event, values = info_window.read()
+
+                    if event == sg.WIN_CLOSED or event == 'Cancel':
+                        info_window.close()
+                        break
+                    elif event == 'Change Staff Name':
+                        new_staff_name = sg.popup_get_text('Enter new staff name:')
+                        if new_staff_name:
+                            # Update the staff name in the database and refresh the display
+                            staff_info['staff_name'] = new_staff_name
+                            info_window['-STAFF_NAME-'].update(f"Staff Name: {staff_info['staff_name']}")
+                    # Similar logic for other fields (Staff Post, Gender, Password) goes here
+
+                info_window.close()
+
+    window.close()
     
 
 # Function 4: Once the staff logins asking them what they want to do
