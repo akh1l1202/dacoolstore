@@ -125,8 +125,28 @@ def display_attendance_tab(db):
 
     window.close()
 
-def employee_info_tab:
-    cursor = db
+def employee_info_tab():
+    try:
+        cursor = db.cursor
+        cursor.execute('SELECT* FROM staff;')
+        staff_info = cursor.fetchall()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+    display_layout = [
+        [sg.Text("Employee Information", font=("Helvetica", 18))],
+        [sg.Table(values=staff_info, headings=["StaffID", "Name", "Post", "Gender", "Password"], auto_size_columns=False,
+                  display_row_numbers=False, justification="center", num_rows=10, key='-TABLE-')],
+        [sg.Exit(), sg.Button('Back')]
+    ]
+    delete_layout = [
+        [sg.Text('Enter Staff ID:'), sg.InputText(key='-STAFF_ID-')],
+        [sg.Text('Enter Staff Name:'), sg.InputText(key='-STAFF_NAME-')],
+        [sg.Button('Submit'), sg.Button('Cancel')]
+    ]
+    update_layout = [
+        
+    ]
     
 
 # Function 4: Once the staff logins asking them what they want to do
