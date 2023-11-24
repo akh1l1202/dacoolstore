@@ -501,17 +501,23 @@ def staff_options_window():
 
 # Function 5: To display all the orders
 def display_all_orderstab(db):
-
     sg.theme('BrownBlue')
     layout = [
-        [sg.Text("All Orders", font=("Helvetica", 18))],
-        [sg.Table(values=[], headings=["Cust. ID", "Phone No.", "Delivery Address", "Note", "Time", "Status"], 
-                  auto_size_columns=False, col_widths=[6, 13, 25, 20, 15, 13], display_row_numbers=False, 
-                  justification="center", num_rows=20, key='-TABLE-')],
+        [sg.TabGroup([
+            [sg.Tab('Display Orders', [
+                [sg.Text("All Orders", font=("Helvetica", 18))],
+                [sg.Table(values=[], headings=["Cust. ID", "OrderID", "Phone No.", "Delivery Address", "Note", "Time", "Status"], 
+                        auto_size_columns=False, col_widths=[6, 8, 13, 25, 20, 15, 13], display_row_numbers=False, justification="center", num_rows=20, key='-TABLE-')]
+            ])],
+            [sg.Tab('Update Orders', [
+                [sg.Text('Enter Order ID:'), sg.InputText(key='-ORDER_ID-')],
+                [sg.Text('Select Delivery Status:'), sg.Radio('Delivered', group_id='-DELIVERY_STATUS-', key='-DELIVERED-', default=False), sg.Radio('Not Delivered', group_id='-DELIVERY_STATUS-', key='-NOT_DELIVERED-', default=False)],
+                [sg.Button('Update'), sg.Button('Cancel')]
+            ])],
+        ])],
         [sg.Exit(), sg.Button('Back')]
     ]
-
-    window = sg.Window("All Orders", layout, finalize=True)
+    window = sg.Window('Customer Orders', layout, finalize=True)
 
     try:
         cursor = db.cursor(dictionary=True)
@@ -520,22 +526,35 @@ def display_all_orderstab(db):
         table_data = []
 
         for order in orders:
-            table_data.append([order["Cust_ID"], order["Cust_PhoneNumber"], order["Cust_HomeAddress"], order["Note"], order["Time"], order["Delivery_Status"]])
+            table_data.append([order["Cust_ID"], order["OrderID"], order["Cust_PhoneNumber"], order["Cust_HomeAddress"], order["Note"], order["Time"], order["Delivery_Status"]])
 
         window['-TABLE-'].update(values=table_data)
 
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
+
     while True:
         event, values = window.read()
-        if event in (sg.WIN_CLOSED, "Exit"):
+        if event in (sg.WIN_CLOSED, 'Exit'):
             break
-        if event == 'Back':
-            window.close()
+        elif event == 'Back':
+            window.hide()
             staff_options_window()
-
+        elif event == 'Update':
+            order_id = values['-ORDER_ID-']
+            delivered = values['-DELIVERED-']
+            
+            if order_id:
+                try:
+                    delivery_status = 'Delivered' if delivered else 'Not Delivered'
+                    cursor.execute('UPDATE orders SET Delivery_Status=%s WHERE OrderID=%s;', (delivery_status, order_id))
+                    db.commit()
+                    sg.popup('Delivery Status Updated Successfully!')
+                except mysql.connector.Error as err:
+                    sg.popup_error(f"Error: {err}")
     window.close()
+
 
 # Function 6: To fetch all from the table customers and display it in a window see_customer_data
 def fetch_all_and_displaywindowtab(db):
@@ -568,30 +587,36 @@ def fetch_all_and_displaywindowtab(db):
 
 # Function 7: To take inputs from the staff for the new product and then insert the values into the products table
 def add_product_to_dbtab(db):
-
-    sg.theme('BrownBlue')
     layout = [
-        [sg.Text("Add New Product", font=("Helvetica", 18))],
-        [sg.Text("Product Name:"), sg.InputText(key='-PRODUCTNAME-')],
-        [sg.Text("Price:"), sg.InputText(key='-PRICE-')],
-        [sg.Text("Category ID:"), sg.InputText(key='-CATEGORYID-')],
-        [sg.Button("Add Product", bind_return_key=True), sg.Exit(), sg.Button('Back')]
+        [sg.TabGroup([
+            [sg.Tab('Add Product', [
+                [sg.Text("Add New Product", font=("Helvetica", 18))],
+                [sg.Text("Product Name:"), sg.InputText(key='-PRODUCTNAME-')],
+                [sg.Text("Price:"), sg.InputText(key='-PRICE-')],
+                [sg.Text("Category ID:"), sg.InputText(key='-CATEGORYID-')],
+                [sg.Button("Add Product", bind_return_key=True)]
+            ])],
+            [sg.Tab('Delete Product', [
+                [sg.Text('Enter Product ID:'), sg.InputText(key='-PRODUCT_ID-')],
+                [sg.Text('Enter Product Name:'), sg.InputText(key='-PRODUCT_NAME-')],
+                [sg.Button('Delete'), sg.Button('Cancel')]
+            ])],
+        ])],
+        [sg.Exit(), sg.Button('Back')]
     ]
-
-    window = sg.Window("Add Product", layout, finalize=True)
+    window = sg.Window('Products', layout)
     while True:
         event, values = window.read()
-        if event in (sg.WIN_CLOSED, "Exit"):
+        if event in (sg.WIN_CLOSED, 'Exit'):
             break
-        if event == 'Back':
+        elif event == 'Back':
             window.hide()
-            staff_options_window()
-        elif event == "Add Product":
+            
+        elif event == 'Add Product':
             window.hide()
             product_name = values['-PRODUCTNAME-']
             price = values['-PRICE-']
             category_id = values['-CATEGORYID-']
-
             try:
                 cursor = db.cursor()
                 insert_query = "INSERT INTO products (ProductName, Price, CategoryID) VALUES (%s, %s, %s);"
@@ -603,34 +628,52 @@ def add_product_to_dbtab(db):
 
             except mysql.connector.Error as err:
                 sg.popup_error(f"Error occurred during product addition: {err}")
+        elif event == 'Delete':
+            product_id = values['-PRODUCT_ID-']
+            product_name = values['-PRODUCT_NAME-']
 
+            if product_id and product_name:
+                try:
+                    cursor = db.cursor()
+                    cursor.execute('DELETE FROM products WHERE ProductID=%s AND ProductName=%s;', (product_id, product_name))
+                    db.commit()
+                    sg.popup('Product Deleted Successfully!')
+                except mysql.connector.Error as err:
+                    sg.popup_error(f"Error: {err}")
     window.close()
 
 # Function 8: To take inputs from the staff for the new category and then insert the values into the table categories
 def add_category_to_dbtab(db):
-
-    sg.theme('BrownBlue')
-    layout = [
-        [sg.Text("Add New Category", font=("Helvetica", 18))],
-        [sg.Text("Category ID:"), sg.InputText(key='-CATEGORYID-')],
-        [sg.Text("Category Name:"), sg.InputText(key='-CATEGORYNAME-')],
-        [sg.Text("\nCategoryID should not be matching with any existing ones.")],
-        [sg.Button("Add Category", bind_return_key=True), sg.Exit(), sg.Button('Back')]
-    ]
-
-    window = sg.Window("Add Category", layout, finalize=True)
+    layout=[
+        [sg.TabGroup([
+            [sg.Tab('Create Category', [
+                [sg.Text("Add New Category", font=("Helvetica", 18))],
+                [sg.Text("Category ID:"), sg.InputText(key='-CATEGORYID-')],
+                [sg.Text("Category Name:"), sg.InputText(key='-CATEGORYNAME-')],
+                [sg.Text("\nCategoryID should not be matching with any existing ones.")],
+                [sg.Button("Add Category", bind_return_key=True)]
+        ])],
+        [sg.Tab('Delete Category', [
+            [sg.Text('Enter Category ID:'), sg.InputText(key='-CATEGORY_ID-')],
+            [sg.Text('Enter Category Name:'), sg.InputText(key='-CATEGORY_NAME-')],
+            [sg.Text("\nNo Product should be existing in the deleting category.")],
+            [sg.Button('Delete'), sg.Button('Cancel')]
+        ])],
+    ])],
+    [sg.Exit(), sg.Button('Back')]
+]
+    window = sg.Window('Categories', layout)
     while True:
         event, values = window.read()
-        if event in (sg.WIN_CLOSED, "Exit"):
+        if event in (sg.WIN_CLOSED, 'Exit'):
             break
-        if event == 'Back':
+        elif event == 'Back':
             window.hide()
             staff_options_window()
-        elif event == "Add Category":
+        elif event == 'Add Category':
             window.hide()
             category_id = values['-CATEGORYID-']
             category_name = values['-CATEGORYNAME-']
-
             try:
                 cursor = db.cursor()
                 insert_query = "INSERT INTO categories (CategoryID, CategoryName) VALUES (%s, %s);"
@@ -642,8 +685,18 @@ def add_category_to_dbtab(db):
 
             except mysql.connector.Error as err:
                 sg.popup_error(f"Error occurred during category addition: {err}")
+        elif event == 'Delete':
+            category_id = values['-CATEGORY_ID-']
+            category_name = values['-CATEGORY_NAME-']
 
-    window.close()
+            if category_id and category_name:
+                try:
+                    cursor = db.cursor()
+                    cursor.execute('DELETE FROM categories WHERE CategoryID=%s AND CategoryName=%s;', (category_id, category_name))
+                    db.commit()
+                    sg.popup('Category Deleted Successfully!')
+                except mysql.connector.Error as err:
+                    sg.popup_error(f"Error: {err}")
 
 # Function 9: Create a customer registration window
 def customer_registration_window():
@@ -997,7 +1050,7 @@ def display_customer_orders(db):
                   col_widths=[10, 25, 20, 15, 13], display_row_numbers=False, justification="center ", key='-TABLE-', row_height=35)]
     ]
 
-    window = sg.Window("Your Existing Orders", layout, finalize=True)
+    window = sg.Window("Your Existing Orders", layout, finalize=True,)
 
     while True:
         event, values = window.read()
@@ -1048,7 +1101,7 @@ def main():
         [sg.Button("Staff"), sg.Button("New User"), sg.Button("Existing User"), sg.Exit()]
     ]
 
-    window_choice = sg.Window('Da Cool Store', layout_choice, element_justification="c")
+    window_choice = sg.Window('Da Cool Store', layout_choice, element_justification="c", size=(500, 450))
 
     while True:
         event_choice, _ = window_choice.read()
