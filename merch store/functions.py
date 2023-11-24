@@ -10,10 +10,10 @@ Time: %H:%M:%S''')
 def connect_to_database():
     try:
         db = mysql.connector.connect(
-            host='sql12.freemysqlhosting.net',
-            user='sql12663296',
-            password='5tsIMMy6fP',
-            database='sql12663296'
+            host='localhost',
+            user='root',
+            password='akhil1202',
+            database='dacoolstore'
         )
         return db
 
@@ -94,6 +94,9 @@ def admin_window():
         elif event == 'Employee Attendance':
             window.hide()
             display_attendance_tab(connect_to_database())
+        elif event == 'Employee Info':
+            window.hide()
+            employee_info_tab(connect_to_database())
 
     window.close()
 
@@ -125,9 +128,9 @@ def display_attendance_tab(db):
 
     window.close()
 
-def employee_info_tab():
+def employee_info_tab(db):
     try:
-        cursor = db.cursor
+        cursor = db.cursor()
         cursor.execute('SELECT* FROM staff;')
         staff_info = cursor.fetchall()
     except mysql.connector.Error as err:
@@ -135,19 +138,49 @@ def employee_info_tab():
 
     layout = [
         [sg.TabGroup([
-        display_layout = [
-        [sg.Text("Employee Information", font=("Helvetica", 18))],
-        [sg.Table(values=staff_info, headings=["StaffID", "Name", "Post", "Gender", "Password"], auto_size_columns=False,
-                  display_row_numbers=False, justification="center", num_rows=10, key='-TABLE-')],
+            [sg.Tab('Staff Info', [
+                [sg.Text("Employee Information", font=("Helvetica", 18))],
+                [sg.Table(values=staff_info, headings=["StaffID", "Name", "Post", "Gender", "Password"], auto_size_columns=False, display_row_numbers=False, justification="center", num_rows=10, key='-TABLE-')],
+                
+            ])],
+            [sg.Tab('Delete Staff Info', [
+                [sg.Text('Enter Staff ID:'), sg.InputText(key='-ID-')],
+                [sg.Text('Enter Staff Name:'), sg.InputText(key='-NAME-')],
+                [sg.Button('Submit'), sg.Button('Cancel')]
+            ])],
+        ])],
         [sg.Exit(), sg.Button('Back')]
     ]
-    delete_layout = [
-        [sg.Text('Enter Staff ID:'), sg.InputText(key='-STAFF_ID-')],
-        [sg.Text('Enter Staff Name:'), sg.InputText(key='-STAFF_NAME-')],
-        [sg.Button('Submit'), sg.Button('Cancel')]
-    ]
     
-
+    window = sg.Window('Employees', layout)
+    while True:
+        event, values = window.read()
+        
+        if event in (sg.WIN_CLOSED, 'Exit'):
+            break
+        elif event == 'Back':
+            window.hide()
+            admin_window()
+        elif event == 'Submit':
+            window.hide()
+            cid = values['-ID-']
+            name = values['-NAME-']
+            if cid==1 and name=='Akhil Tyagi':
+                sg.popup('You cant delete that bro.')
+                window.close()
+                break
+            elif not cid==1 and name=='Akhil Tyagi':
+                try:
+                    cursor = db.cursor()
+                    insert_query = 'DELETE FROM staff WHERE Staff_ID=%s and Staff_Name=%s;'
+                    values = (cid, name)
+                    cursor.execute(insert_query, values)
+                    db.commit()
+                    sg.popup('Successful')
+                except mysql.connector.Error as err:
+                    print(f"Error: {err}")
+            
+    window.close()
 
 def staff_info_window():
     sg.theme('LightGrey1')  # Set the theme
