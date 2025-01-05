@@ -10,10 +10,10 @@ Time: %H:%M:%S''')
 def connect_to_database():
     try:
         db = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            password='akhil1202',
-            database='dacoolstore',
+            host='sql12.freemysqlhosting.net',
+            user='sql12755807',
+            password='LPxCZC97bu',
+            database='sql12755807',
         )
         return db
 
