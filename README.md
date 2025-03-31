@@ -1,3 +1,9 @@
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
+
 # Da Cool Store
 
 Welcome to **Da Cool Store**! This is an online store application built using Python and PySimpleGUI that allows customers and staff to interact seamlessly. Customers can register, log in, and browse products, while staff members have access to their own login system to manage the store.
