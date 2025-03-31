@@ -1,8 +1,3 @@
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-
 
 # Da Cool Store
 
@@ -99,3 +94,8 @@ Email: tyagi.akhil1202@gmail.com
 GitHub: https://github.com/akh1l1202
 
 Happy coding! 🎉
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
