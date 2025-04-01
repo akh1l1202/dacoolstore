@@ -85,7 +85,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 - **PySimpleGUI**: For the easy-to-use GUI framework.
 - **MySQL**: For the database management system.
-- **OpenAI**: For their AI models used to assist in code development.
 
 ## Contact
 If you have any questions or feedback, feel free to reach out to the project maintainers:
