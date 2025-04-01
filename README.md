@@ -53,9 +53,6 @@ pip install -r requirements.txt
 
 - All the tables will be initialised automatically once you run the program.
 
-```bash
-mysql -u root -p dacoolstore < database/dacoolstore.sql
-```
 ### 6. Configure the database connection:
 - Open ```database.py``` and ensure that the MySQL database credentials (host, user, password) are correctly set for your local MySQL instance.
 
