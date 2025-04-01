@@ -6,7 +6,7 @@ def connect_to_database():
         db = mysql.connector.connect(
             host='localhost',
             user='root',
-            password='######',
+            password='######',  #Replace the hashes with the paasword you setup for your local database server.
             database='dacoolstore',
         )
         return db
