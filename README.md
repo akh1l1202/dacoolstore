@@ -51,7 +51,7 @@ pip install -r requirements.txt
 ### 5. Set up the database:
 - Install MySQL if you haven't already, and set up a database named ```dacoolstore```.
 
-- Import the SQL dump file provided in the ```database``` folder into your MySQL instance to create all the necessary tables.
+- All the tables will be initialised automatically once you run the program.
 
 ```bash
 mysql -u root -p dacoolstore < database/dacoolstore.sql
