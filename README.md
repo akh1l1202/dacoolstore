@@ -89,7 +89,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact
 If you have any questions or feedback, feel free to reach out to the project maintainers:
 - Email: [tyagi.akhil1202@gmail.com](mailto:tyagi.akhil1202@gmail.com)
-- [GitHub](https://github.com/akh1l1202):
+- GitHub: [akh1l1202](https://github.com/akh1l1202)
 
 Happy coding! 🎉
 
