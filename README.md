@@ -67,15 +67,6 @@ This will launch the application. Follow the on-screen prompts to interact with 
 ## Staff Login
 ## Customer Registration
 
-## Contributing
-We welcome contributions to **Da Cool Store**! To contribute:
-
-1. Fork this repository.
-2. Create a new branch (```git checkout -b feature/your-feature```).
-3. Make your changes.
-4. Commit your changes (```git commit -m 'Add new feature'```).
-5. Push to the branch (```git push origin feature/your-feature```).
-6. Open a pull request.
 
 ## License
 
