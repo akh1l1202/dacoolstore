@@ -1,6 +1,5 @@
 import mysql.connector
 
-# Function 1: Establish a connection to the MySQL database
 def connect_to_database():
     try:
         db = mysql.connector.connect(
@@ -15,12 +14,10 @@ def connect_to_database():
         print(f"Error: {err}")
         return None
 
-# Function to check if a table exists
 def table_exists(cursor, table_name):
     cursor.execute("SHOW TABLES LIKE %s", (table_name,))
     return cursor.fetchone() is not None
 
-# Function to check and create tables
 def check_and_create_tables():
     connection = connect_to_database()
     if not connection:
@@ -204,7 +201,6 @@ def insert_sample_data():
         cursor.close()
         conn.close()
         
-# Function 10: Insert customer data into the database
 def insert_customer_data(db, name, gender, email, phone, password):
     try:
         cursor = db.cursor()
@@ -219,7 +215,6 @@ def insert_customer_data(db, name, gender, email, phone, password):
         print(f"Error: {err}")
         return False
 
-# Function 14: Fetch product categories from the database
 def fetch_categories(db):
     try:
         categories = []
@@ -233,7 +228,6 @@ def fetch_categories(db):
         print(f"Error: {err}")
         return []
 
-# Function 15: Fetch products by category from the database
 def fetch_products_by_category(db, category):
     try:
         products = []
@@ -247,7 +241,6 @@ def fetch_products_by_category(db, category):
         print(f"Error: {err}")
         return []
 
-# Function 16: To fetch info of only the products in the list selected_product_names
 def fetch_product_info_by_names(db, selected_product_names):
     try:
         cursor = db.cursor(dictionary=True)
