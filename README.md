@@ -11,11 +11,11 @@ Welcome to **Da Cool Store**! This is an online store application built using Py
 - **Order Management**: Customers can place orders and track their delivery status.
 - **Database Integration**: The app integrates with a MySQL database to store customer and staff information, orders, and products.
 
-## Technologies Used
+## Requirements
 
-- **Python**: The main programming language used for the application.
+- **Python 3.9+**: The main programming language used for the application.
 - **PySimpleGUI**: A simple and easy-to-use graphical user interface (GUI) library for building desktop applications.
-- **MySQL**: A relational database management system to store all store-related data, including staff, customers, and orders.
+- **MySQL Server 8+**: A relational database management system to store all store-related data, including staff, customers, and orders.
 - **MySQL Connector for Python**: A Python library used to connect and interact with MySQL databases.
 
 ## Installation
