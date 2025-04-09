@@ -1,9 +1,10 @@
 import PySimpleGUI as sg
-from database import connect_to_database, check_and_create_tables
+from database import connect_to_database, check_and_create_tables, insert_sample_data
 from staff import staff_login_window
 
 
 def main():
+    insert_sample_data()
     sg.theme('BrownBlue')
 
     layout_choice = [
