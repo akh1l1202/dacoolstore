@@ -52,6 +52,7 @@ pip install -r requirements.txt
 - Install MySQL if you haven't already, and set up a database named ```dacoolstore```.
 
 - All the tables will be initialised automatically once you run the program.
+- Data can be manually entered into the SQL tables using MySQL Command Line or Workbench. Alternatively, if no data is present, the program will auto-populate the tables with sample data for debugging purposes during first-time setup. You can also use these tools to verify the data.
 
 ### 6. Configure the database connection:
 - Open ```database.py``` and ensure that the MySQL database credentials (host, user, password) are correctly set for your local MySQL instance.
