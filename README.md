@@ -64,11 +64,22 @@ python utils.py
 This will launch the application. Follow the on-screen prompts to interact with the store.
 
 ## Screenshots
+![image](https://github.com/user-attachments/assets/ad1dc5d5-0aaf-40a6-be3b-5ad676f47937)
+![image](https://github.com/user-attachments/assets/110dd8a6-9277-4a36-89e3-ff6dc32dce28)
+![image](https://github.com/user-attachments/assets/7c6ab494-0e00-443d-8371-673df323ee6a)
+![image](https://github.com/user-attachments/assets/01d60fde-86f9-4407-9803-9bfd0fa8c2b9)
+
+
+
 ## Welcome Screen
 ![image](https://github.com/user-attachments/assets/3c487260-9e36-4849-9add-781c310d16c1)
 
 ## Staff Login
+![image](https://github.com/user-attachments/assets/95a9dc39-192c-4225-8f03-ad04fa9a3e00)
+
 ## Customer Registration
+![image](https://github.com/user-attachments/assets/27ba08ce-e573-4fac-a72f-9c293a869a49)
+
 
 
 ## License
