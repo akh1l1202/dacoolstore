@@ -65,6 +65,8 @@ This will launch the application. Follow the on-screen prompts to interact with 
 
 ## Screenshots
 ## Welcome Screen
+![image](https://github.com/user-attachments/assets/3c487260-9e36-4849-9add-781c310d16c1)
+
 ## Staff Login
 ## Customer Registration
 
