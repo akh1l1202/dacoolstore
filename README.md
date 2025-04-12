@@ -67,7 +67,6 @@ This will launch the application. Follow the on-screen prompts to interact with 
 ![image](https://github.com/user-attachments/assets/ad1dc5d5-0aaf-40a6-be3b-5ad676f47937)
 ![image](https://github.com/user-attachments/assets/110dd8a6-9277-4a36-89e3-ff6dc32dce28)
 ![image](https://github.com/user-attachments/assets/7c6ab494-0e00-443d-8371-673df323ee6a)
-![image](https://github.com/user-attachments/assets/01d60fde-86f9-4407-9803-9bfd0fa8c2b9)
 
 
 
